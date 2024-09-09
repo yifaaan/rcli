@@ -1,0 +1,3 @@
+# RCLI
+
+Rust CLI tool.
