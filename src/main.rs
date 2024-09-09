@@ -1,7 +1,5 @@
-use std::fs;
-
 use clap::Parser;
-use rcli::{process_csv, Cli, SubCommand};
+use rcli::{process_csv, process_genpass, Cli, SubCommand};
 
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
@@ -14,6 +12,16 @@ fn main() -> anyhow::Result<()> {
                 format!("output.{}", opts.format)
             };
             process_csv(&opts.input, output, opts.format)?
+        }
+        SubCommand::GenPass(opts) => {
+            println!("{:?}", opts);
+            process_genpass(
+                opts.length,
+                opts.uppercase,
+                opts.lowercase,
+                opts.number,
+                opts.symbol,
+            )?
         }
     }
 

@@ -12,6 +12,8 @@ pub struct Cli {
 pub enum SubCommand {
     #[command(name = "csv", about = "Convert CSV to other formats")]
     Csv(CsvOpts),
+    #[command(name = "genpass", about = "Generate a random password")]
+    GenPass(GenPassOpts),
 }
 
 #[derive(Parser, Debug)]
@@ -71,6 +73,24 @@ impl Display for OutputFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", Into::<&str>::into(*self))
     }
+}
+
+#[derive(Parser, Debug)]
+pub struct GenPassOpts {
+    #[arg(short, long, default_value = "16")]
+    pub length: u8,
+
+    #[arg(long, default_value = "true")]
+    pub uppercase: bool,
+
+    #[arg(long, default_value = "true")]
+    pub lowercase: bool,
+
+    #[arg(long, default_value = "true")]
+    pub number: bool,
+
+    #[arg(long, default_value = "true")]
+    pub symbol: bool,
 }
 
 fn verify_input_file(filename: &str) -> Result<String, String> {
