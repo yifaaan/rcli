@@ -1,20 +1,7 @@
-use clap::{arg, Parser, Subcommand};
-use std::{fmt::Display, path::Path, str::FromStr};
+use clap::{arg, Parser};
+use std::{fmt::Display, str::FromStr};
 
-#[derive(Parser, Debug)]
-#[command(name="rcli", version, author, about, long_about=None)]
-pub struct Cli {
-    #[command(subcommand)]
-    pub cmd: SubCommand,
-}
-
-#[derive(Subcommand, Debug)]
-pub enum SubCommand {
-    #[command(name = "csv", about = "Convert CSV to other formats")]
-    Csv(CsvOpts),
-    #[command(name = "genpass", about = "Generate a random password")]
-    GenPass(GenPassOpts),
-}
+use super::verify_input_file;
 
 #[derive(Parser, Debug)]
 pub struct CsvOpts {
@@ -72,32 +59,6 @@ impl FromStr for OutputFormat {
 impl Display for OutputFormat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", Into::<&str>::into(*self))
-    }
-}
-
-#[derive(Parser, Debug)]
-pub struct GenPassOpts {
-    #[arg(short, long, default_value = "16")]
-    pub length: u8,
-
-    #[arg(long, default_value = "true")]
-    pub uppercase: bool,
-
-    #[arg(long, default_value = "true")]
-    pub lowercase: bool,
-
-    #[arg(long, default_value = "true")]
-    pub number: bool,
-
-    #[arg(long, default_value = "true")]
-    pub symbol: bool,
-}
-
-fn verify_input_file(filename: &str) -> Result<String, String> {
-    if Path::new(filename).exists() {
-        Ok(filename.into())
-    } else {
-        Err("File does not exist".into())
     }
 }
 
