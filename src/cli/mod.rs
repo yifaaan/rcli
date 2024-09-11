@@ -14,6 +14,8 @@ pub use b64::{process_decode, process_encode};
 pub use csv::OutputFormat;
 pub use genpass::GenPassOpts;
 
+use crate::{process_csv, process_genpass, CmdExcutor};
+
 #[derive(Parser, Debug)]
 #[command(name="rcli", version, author, about, long_about=None)]
 pub struct Cli {
@@ -31,6 +33,33 @@ pub enum SubCommand {
     Base64(Base64SubCommand),
     #[command(subcommand)]
     Http(HttpSubCommand),
+}
+
+impl CmdExcutor for SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            Self::Csv(opts) => {
+                let output = if let Some(output) = opts.output {
+                    output
+                } else {
+                    format!("output.{}", opts.format)
+                };
+                process_csv(&opts.input, output, opts.format)
+            }
+            Self::GenPass(opts) => {
+                // println!("{:?}", opts);
+                process_genpass(
+                    opts.length,
+                    opts.uppercase,
+                    opts.lowercase,
+                    opts.number,
+                    opts.symbol,
+                )
+            }
+            Self::Base64(subcmd) => subcmd.execute().await,
+            Self::Http(subcmd) => subcmd.execute().await,
+        }
+    }
 }
 
 fn verify_file(filename: &str) -> Result<String, String> {

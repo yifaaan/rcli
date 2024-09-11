@@ -2,6 +2,8 @@ use std::{fs::File, io::Read, str::FromStr};
 
 use clap::{Parser, Subcommand};
 
+use crate::CmdExcutor;
+
 use super::verify_file;
 use base64::{
     engine::general_purpose::{STANDARD, URL_SAFE},
@@ -14,6 +16,15 @@ pub enum Base64SubCommand {
     Decode(Base64DecodeOpts),
     #[command(name = "encode", about = "Encode a base 64 string")]
     Encode(Base64EncodeOpts),
+}
+
+impl CmdExcutor for Base64SubCommand {
+    async fn execute(self) -> anyhow::Result<()> {
+        match self {
+            Self::Encode(opts) => process_encode(&opts.input, opts.format),
+            Self::Decode(opts) => process_decode(&opts.input, opts.format),
+        }
+    }
 }
 
 #[derive(Parser, Debug)]
